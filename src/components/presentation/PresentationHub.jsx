@@ -1,21 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PresentationEditor from './PresentationEditor';
 import LiveHostScreen from './LiveHostScreen';
 import StudentJoinScreen from './StudentJoinScreen';
 import { DEFAULT_LESSON } from '../../data/defaultPresentation';
+import { subscribeToLiveRoom, broadcastToRoom, isSupabaseConfigured } from '../../lib/supabaseClient';
 import { 
   Tv, 
   Smartphone, 
   SplitSquareVertical, 
   Edit3, 
   Sparkles,
-  Users
+  Users,
+  Radio,
+  CloudCheck,
+  CheckCircle2
 } from 'lucide-react';
 
 export default function PresentationHub({ onBackToDashboard }) {
   const [lesson, setLesson] = useState(DEFAULT_LESSON);
   const [viewMode, setViewMode] = useState('editor'); // 'editor' | 'host' | 'student' | 'split'
   const [currentHostSlideIndex, setCurrentHostSlideIndex] = useState(0);
+  const [isCloudSynced, setIsCloudSynced] = useState(isSupabaseConfigured);
 
   // Live session state
   const [students, setStudents] = useState([
@@ -30,6 +35,83 @@ export default function PresentationHub({ onBackToDashboard }) {
     1: { 'st-1': 0, 'st-2': 0, 'st-3': 1, 'st-4': 0 }, // 3 chọn đúng, 1 chọn B
     3: { 'st-1': [0, 1, 3], 'st-2': [0, 1], 'st-3': [0, 1, 3] },
   });
+
+  const channelRef = useRef(null);
+
+  // ================= 1. SUPABASE REALTIME MULTI-DEVICE SYNC =================
+  useEffect(() => {
+    const pin = lesson?.pinCode || '682915';
+
+    // Đăng ký kênh Supabase Realtime cho mã phòng
+    const channel = subscribeToLiveRoom(pin, (event) => {
+      console.log('⚡ Nhận sự kiện Realtime từ Supabase:', event);
+      if (!event || !event.action) return;
+
+      switch (event.action) {
+        // Giáo viên chuyển slide -> Học sinh nhận được và nhảy sang slide tương ứng
+        case 'slide_change':
+          if (typeof event.slideIndex === 'number') {
+            setCurrentHostSlideIndex(event.slideIndex);
+          }
+          break;
+
+        // Học sinh ở thiết bị khác tham gia phòng thi
+        case 'student_join':
+          if (event.student && event.student.id) {
+            setStudents((prev) => {
+              if (prev.some((s) => s.id === event.student.id)) return prev;
+              return [...prev, event.student];
+            });
+          }
+          break;
+
+        // Học sinh ở thiết bị khác nộp đáp án
+        case 'submit_answer':
+          if (event.studentId) {
+            const { studentId, slideIndex, answer, isCorrect, points } = event;
+            setStudentAnswers((prev) => ({
+              ...prev,
+              [slideIndex]: {
+                ...(prev[slideIndex] || {}),
+                [studentId]: answer,
+              },
+            }));
+
+            setStudents((prev) =>
+              prev.map((st) => {
+                if (st.id === studentId) {
+                  return {
+                    ...st,
+                    score: (st.score || 0) + (points || 0),
+                    streak: isCorrect ? (st.streak || 0) + 1 : 0,
+                  };
+                }
+                return st;
+              })
+            );
+          }
+          break;
+
+        // Học sinh xin đồng bộ slide hiện tại khi vừa vào
+        case 'request_current_slide':
+          broadcastToRoom(channelRef.current, 'slide_change', {
+            slideIndex: currentHostSlideIndex,
+          });
+          break;
+
+        default:
+          break;
+      }
+    });
+
+    channelRef.current = channel;
+
+    return () => {
+      if (channel) {
+        channel.unsubscribe();
+      }
+    };
+  }, [lesson?.pinCode]);
 
   const handleAddSimulatedStudent = () => {
     const BOT_NAMES = ['Tuệ Nhi', 'Đăng Khoa', 'Quỳnh Anh', 'Thanh Trúc', 'Hải Đăng', 'Phương Linh'];
@@ -46,36 +128,62 @@ export default function PresentationHub({ onBackToDashboard }) {
     };
 
     setStudents((prev) => [...prev, newBot]);
+
+    // Broadcast tới các thiết bị khác
+    broadcastToRoom(channelRef.current, 'student_join', { student: newBot });
   };
 
   const handleStudentJoin = (newStudent) => {
     setStudents((prev) => {
-      if (prev.some(s => s.id === newStudent.id)) return prev;
+      if (prev.some((s) => s.id === newStudent.id)) return prev;
       return [...prev, newStudent];
     });
+
+    // Phát broadcast qua Supabase
+    broadcastToRoom(channelRef.current, 'student_join', { student: newStudent });
+    // Xin đồng bộ slide từ host
+    broadcastToRoom(channelRef.current, 'request_current_slide', { studentId: newStudent.id });
   };
 
   const handleStudentSubmitAnswer = (studentId, slideIndex, answer, isCorrect, points) => {
-    // Save answer
+    // Lưu cục bộ
     setStudentAnswers((prev) => ({
       ...prev,
       [slideIndex]: {
         ...(prev[slideIndex] || {}),
-        [studentId]: answer
-      }
+        [studentId]: answer,
+      },
     }));
 
-    // Update student score in list
-    setStudents((prev) => prev.map((st) => {
-      if (st.id === studentId) {
-        return {
-          ...st,
-          score: (st.score || 0) + (points || 0),
-          streak: isCorrect ? (st.streak || 0) + 1 : 0
-        };
-      }
-      return st;
-    }));
+    setStudents((prev) =>
+      prev.map((st) => {
+        if (st.id === studentId) {
+          return {
+            ...st,
+            score: (st.score || 0) + (points || 0),
+            streak: isCorrect ? (st.streak || 0) + 1 : 0,
+          };
+        }
+        return st;
+      })
+    );
+
+    // Phát broadcast qua Supabase cho host và các màn hình khác
+    broadcastToRoom(channelRef.current, 'submit_answer', {
+      studentId,
+      slideIndex,
+      answer,
+      isCorrect,
+      points,
+    });
+  };
+
+  const handleSlideChange = (newIndex) => {
+    setCurrentHostSlideIndex(newIndex);
+    // Broadcast slide mới cho tất cả học sinh đang kết nối qua mã PIN
+    broadcastToRoom(channelRef.current, 'slide_change', {
+      slideIndex: newIndex,
+    });
   };
 
   return (
@@ -88,6 +196,12 @@ export default function PresentationHub({ onBackToDashboard }) {
           </span>
           <span className="text-white/20">|</span>
           <span className="text-white/60 truncate max-w-xs">{lesson.title}</span>
+
+          {/* Supabase Realtime Status Pill */}
+          <div className="hidden sm:flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[10px] font-semibold">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Supabase Cloud: Đang kết nối</span>
+          </div>
         </div>
 
         {/* View Mode Switcher Pills */}
@@ -163,7 +277,7 @@ export default function PresentationHub({ onBackToDashboard }) {
             students={students}
             studentAnswers={studentAnswers}
             onAddSimulatedStudent={handleAddSimulatedStudent}
-            onSlideChange={setCurrentHostSlideIndex}
+            onSlideChange={handleSlideChange}
             currentHostSlideIndex={currentHostSlideIndex}
             onEndLesson={() => setViewMode('editor')}
           />
@@ -191,7 +305,7 @@ export default function PresentationHub({ onBackToDashboard }) {
                 students={students}
                 studentAnswers={studentAnswers}
                 onAddSimulatedStudent={handleAddSimulatedStudent}
-                onSlideChange={setCurrentHostSlideIndex}
+                onSlideChange={handleSlideChange}
                 currentHostSlideIndex={currentHostSlideIndex}
                 onEndLesson={() => setViewMode('editor')}
               />
