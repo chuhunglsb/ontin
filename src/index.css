@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+@theme {
+  --color-wds-magenta-500: #8854c0;
+  --color-wds-magenta-600: #733bb2;
+  --color-wds-magenta-700: #5d2a96;
+  --color-wds-magenta-100: #f3ecfb;
+  --color-wds-magenta-50: #faf6fd;
+  
+  --color-wds-dark-500: #121212;
+  --color-wds-dark-400: #292929;
+  --color-wds-dark-300: #525252;
+  --color-wds-dark-200: #737373;
+  --color-wds-dark-100: #a3a3a3;
+  
+  --color-wds-light-500: #ffffff;
+  --color-wds-light-400: #f8f8fa;
+  --color-wds-light-300: #f1f1f4;
+  --color-wds-light-200: #e5e5e8;
+  --color-wds-light-100: #d4d4d8;
+
+  --color-wds-teal-500: #00a389;
+  --color-wds-blue-500: #0084bd;
+  --color-wds-amber-500: #fa7533;
+  --color-wds-rose-500: #e42777;
+
+  --radius-w-admin-lg: 14px;
+  --radius-w-admin-xl: 18px;
+
+  --font-sans: 'DM Sans', 'Quicksand', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #fafafc;
+  color: #121212;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom scrollbar for horizontal categories */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
