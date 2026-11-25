@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import PresentationEditor from './PresentationEditor';
 import LiveHostScreen from './LiveHostScreen';
 import StudentJoinScreen from './StudentJoinScreen';
+import TeacherLoginModal from './TeacherLoginModal';
 import { DEFAULT_LESSON } from '../../data/defaultPresentation';
 import { subscribeToLiveRoom, broadcastToRoom, isSupabaseConfigured } from '../../lib/supabaseClient';
 import { 
@@ -13,7 +14,10 @@ import {
   Users,
   Radio,
   CloudCheck,
-  CheckCircle2
+  CheckCircle2,
+  LogIn,
+  LogOut,
+  ShieldCheck
 } from 'lucide-react';
 
 export default function PresentationHub({ onBackToDashboard }) {
@@ -21,6 +25,33 @@ export default function PresentationHub({ onBackToDashboard }) {
   const [viewMode, setViewMode] = useState('editor'); // 'editor' | 'host' | 'student' | 'split'
   const [currentHostSlideIndex, setCurrentHostSlideIndex] = useState(0);
   const [isCloudSynced, setIsCloudSynced] = useState(isSupabaseConfigured);
+  const [teacherUser, setTeacherUser] = useState(() => {
+    try {
+      return localStorage.getItem('ontin_teacher_user') || null;
+    } catch {
+      return null;
+    }
+  });
+  const [showLoginModal, setShowLoginModal] = useState(false);
+
+  const handleTeacherLoginSuccess = (username) => {
+    setTeacherUser(username);
+    try {
+      localStorage.setItem('ontin_teacher_user', username);
+    } catch {
+      // ignore storage errors
+    }
+    setShowLoginModal(false);
+  };
+
+  const handleTeacherLogout = () => {
+    setTeacherUser(null);
+    try {
+      localStorage.removeItem('ontin_teacher_user');
+    } catch {
+      // ignore storage errors
+    }
+  };
 
   // Live session state
   const [students, setStudents] = useState([
@@ -255,6 +286,34 @@ export default function PresentationHub({ onBackToDashboard }) {
             <span>Song song (Split View)</span>
           </button>
         </div>
+
+        {/* Teacher Auth Status */}
+        <div className="flex items-center gap-2">
+          {teacherUser ? (
+            <div className="flex items-center gap-1.5 bg-white/10 border border-white/15 rounded-xl px-2.5 py-1">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="text-[11px] font-bold text-white hidden sm:inline">
+                GV: {teacherUser}
+              </span>
+              <button
+                onClick={handleTeacherLogout}
+                className="ml-1 flex items-center gap-1 text-[10px] font-bold text-white/70 hover:text-rose-300 transition-colors"
+                title="Đăng xuất tài khoản giáo viên"
+              >
+                <LogOut className="w-3 h-3" />
+                <span className="hidden md:inline">Đăng xuất</span>
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowLoginModal(true)}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-[#8854c0] hover:bg-[#733bb2] text-white font-bold text-[11px] transition-colors shadow-xs"
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              <span>Đăng nhập GV</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Main Mode View Area */}
@@ -267,6 +326,8 @@ export default function PresentationHub({ onBackToDashboard }) {
             onStartLiveHost={() => setViewMode('host')}
             onStudentJoinDirect={() => setViewMode('student')}
             onBackToDashboard={onBackToDashboard}
+            isTeacherAuthenticated={Boolean(teacherUser)}
+            onRequireLogin={() => setShowLoginModal(true)}
           />
         )}
 
@@ -325,6 +386,13 @@ export default function PresentationHub({ onBackToDashboard }) {
           </div>
         )}
       </div>
+
+      {showLoginModal && (
+        <TeacherLoginModal
+          onSuccess={handleTeacherLoginSuccess}
+          onClose={() => setShowLoginModal(false)}
+        />
+      )}
     </div>
   );
 }

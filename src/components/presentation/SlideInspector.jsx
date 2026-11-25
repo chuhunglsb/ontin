@@ -14,6 +14,8 @@ import { SLIDE_TEMPLATES } from '../../data/defaultPresentation';
 export default function SlideInspector({
   slide,
   onUpdateSlide,
+  isReadOnly = false,
+  onRequireLogin = () => {},
 }) {
   if (!slide) return null;
 
@@ -50,7 +52,15 @@ export default function SlideInspector({
         </div>
       </div>
 
-      <div className="p-4 space-y-6">
+      <div
+        className="p-4 space-y-6"
+        onFocusCapture={(e) => {
+          if (isReadOnly && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT')) {
+            e.target.blur();
+            onRequireLogin();
+          }
+        }}
+      >
         {/* 1. Slide Type Selector */}
         <div>
           <label className="text-xs font-bold text-[#525252] block mb-2 uppercase tracking-wider">

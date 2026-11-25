@@ -11,7 +11,8 @@ import {
   HelpCircle,
   GraduationCap,
   BookOpen,
-  ChevronDown
+  ChevronDown,
+  Lock
 } from 'lucide-react';
 import SlideListSidebar from './SlideListSidebar';
 import SlideCanvas from './SlideCanvas';
@@ -23,7 +24,9 @@ export default function PresentationEditor({
   onUpdateLesson,
   onStartLiveHost,
   onStudentJoinDirect,
-  onBackToDashboard
+  onBackToDashboard,
+  isTeacherAuthenticated = false,
+  onRequireLogin = () => {},
 }) {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [showTemplateModal, setShowTemplateModal] = useState(false);
@@ -33,6 +36,10 @@ export default function PresentationEditor({
   const currentSlide = lesson.slides[currentSlideIndex] || lesson.slides[0];
 
   const handleUpdateCurrentSlide = (updatedSlide) => {
+    if (!isTeacherAuthenticated) {
+      onRequireLogin();
+      return;
+    }
     const newSlides = [...lesson.slides];
     newSlides[currentSlideIndex] = updatedSlide;
     onUpdateLesson({
@@ -42,6 +49,10 @@ export default function PresentationEditor({
   };
 
   const handleAddSlide = (type) => {
+    if (!isTeacherAuthenticated) {
+      onRequireLogin();
+      return;
+    }
     let newSlide;
     if (type === 'content') {
       newSlide = {
@@ -112,6 +123,10 @@ export default function PresentationEditor({
   };
 
   const handleDuplicateSlide = (index) => {
+    if (!isTeacherAuthenticated) {
+      onRequireLogin();
+      return;
+    }
     const slideToCopy = lesson.slides[index];
     const duplicated = {
       ...slideToCopy,
@@ -128,6 +143,10 @@ export default function PresentationEditor({
   };
 
   const handleDeleteSlide = (index) => {
+    if (!isTeacherAuthenticated) {
+      onRequireLogin();
+      return;
+    }
     if (lesson.slides.length <= 1) return;
     const newSlides = lesson.slides.filter((_, i) => i !== index);
     onUpdateLesson({
@@ -140,6 +159,10 @@ export default function PresentationEditor({
   };
 
   const handleMoveSlide = (index, direction) => {
+    if (!isTeacherAuthenticated) {
+      onRequireLogin();
+      return;
+    }
     const targetIndex = index + direction;
     if (targetIndex < 0 || targetIndex >= lesson.slides.length) return;
     const newSlides = [...lesson.slides];
@@ -154,8 +177,20 @@ export default function PresentationEditor({
   };
 
   const handleSave = () => {
+    if (!isTeacherAuthenticated) {
+      onRequireLogin();
+      return;
+    }
     setSaveStatus('Đã lưu bài giảng thành công!');
     setTimeout(() => setSaveStatus(null), 2500);
+  };
+
+  const handleOpenTemplateModal = () => {
+    if (!isTeacherAuthenticated) {
+      onRequireLogin();
+      return;
+    }
+    setShowTemplateModal(true);
   };
 
   return (
@@ -197,7 +232,15 @@ export default function PresentationEditor({
               <input
                 type="text"
                 value={lesson.title}
-                onChange={(e) => onUpdateLesson({ ...lesson, title: e.target.value })}
+                readOnly={!isTeacherAuthenticated}
+                onClick={() => !isTeacherAuthenticated && onRequireLogin()}
+                onChange={(e) => {
+                  if (!isTeacherAuthenticated) {
+                    onRequireLogin();
+                    return;
+                  }
+                  onUpdateLesson({ ...lesson, title: e.target.value });
+                }}
                 className="font-extrabold text-sm sm:text-base text-[#121212] outline-none border-b border-transparent hover:border-[#e5e5e8] focus:border-[#8854c0] bg-transparent truncate max-w-sm sm:max-w-md"
               />
               <span className="text-[11px] text-[#737373] hidden md:inline">
@@ -211,10 +254,11 @@ export default function PresentationEditor({
         <div className="flex items-center gap-2.5">
           {/* Quick Add Slide from Header */}
           <button
-            onClick={() => setShowTemplateModal(true)}
+            onClick={handleOpenTemplateModal}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#8854c0]/10 hover:bg-[#8854c0]/20 text-xs font-bold text-[#8854c0] border border-[#8854c0]/30 transition-colors"
-            title="Thêm slide bài giảng hoặc câu hỏi mới"
+            title={isTeacherAuthenticated ? 'Thêm slide bài giảng hoặc câu hỏi mới' : 'Đăng nhập Giáo viên để thêm slide'}
           >
+            {!isTeacherAuthenticated && <Lock className="w-3.5 h-3.5" />}
             <span>+ Thêm slide</span>
           </button>
 
@@ -254,6 +298,24 @@ export default function PresentationEditor({
         </div>
       </header>
 
+      {/* Read-only notice banner when not logged in */}
+      {!isTeacherAuthenticated && (
+        <div className="bg-amber-50 border-b border-amber-200 px-5 py-2 flex items-center justify-between text-xs text-amber-900 flex-shrink-0">
+          <div className="flex items-center gap-2 font-medium">
+            <Lock className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
+            <span>
+              Đang ở <strong>chế độ chỉ xem</strong>. Đăng nhập tài khoản Giáo viên để thêm mới hoặc chỉnh sửa bài giảng.
+            </span>
+          </div>
+          <button
+            onClick={onRequireLogin}
+            className="px-3 py-1 rounded-lg bg-[#8854c0] hover:bg-[#733bb2] text-white font-bold text-[11px] transition-colors flex-shrink-0"
+          >
+            Đăng nhập Giáo viên
+          </button>
+        </div>
+      )}
+
       {/* Main Studio Body: 3-column layout */}
       <div className="flex-1 flex overflow-hidden">
         {/* 1. Left Thumbnail Sidebar */}
@@ -266,7 +328,14 @@ export default function PresentationEditor({
           onDeleteSlide={handleDeleteSlide}
           onMoveSlide={handleMoveSlide}
           showTemplateModal={showTemplateModal}
-          setShowTemplateModal={setShowTemplateModal}
+          setShowTemplateModal={(open) => {
+            if (open && !isTeacherAuthenticated) {
+              onRequireLogin();
+              return;
+            }
+            setShowTemplateModal(open);
+          }}
+          isReadOnly={!isTeacherAuthenticated}
         />
 
         {/* 2. Center Slide Canvas */}
@@ -275,12 +344,16 @@ export default function PresentationEditor({
           slideIndex={currentSlideIndex}
           totalSlides={lesson.slides.length}
           onUpdateSlide={handleUpdateCurrentSlide}
+          isReadOnly={!isTeacherAuthenticated}
+          onRequireLogin={onRequireLogin}
         />
 
         {/* 3. Right Property Inspector */}
         <SlideInspector
           slide={currentSlide}
           onUpdateSlide={handleUpdateCurrentSlide}
+          isReadOnly={!isTeacherAuthenticated}
+          onRequireLogin={onRequireLogin}
         />
       </div>
 

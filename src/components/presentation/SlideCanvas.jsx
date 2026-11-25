@@ -16,6 +16,8 @@ export default function SlideCanvas({
   slideIndex,
   totalSlides,
   onUpdateSlide,
+  isReadOnly = false,
+  onRequireLogin = () => {},
 }) {
   if (!slide) return null;
 
@@ -121,7 +123,15 @@ export default function SlideCanvas({
         </div>
 
         {/* Slide Main Body Area */}
-        <div className="p-8 flex-1 flex flex-col justify-between overflow-y-auto">
+        <div
+          className="p-8 flex-1 flex flex-col justify-between overflow-y-auto"
+          onFocusCapture={(e) => {
+            if (isReadOnly && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+              e.target.blur();
+              onRequireLogin();
+            }
+          }}
+        >
           {/* SLIDE TYPE: CONTENT */}
           {slide.type === 'content' && (
             <div className="space-y-6 flex-1 flex flex-col">

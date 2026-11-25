@@ -11,7 +11,8 @@ import {
   Trash2, 
   ChevronUp, 
   ChevronDown,
-  Layers
+  Layers,
+  Lock
 } from 'lucide-react';
 import { SLIDE_TEMPLATES } from '../../data/defaultPresentation';
 
@@ -24,7 +25,8 @@ export default function SlideListSidebar({
   onDeleteSlide,
   onMoveSlide,
   showTemplateModal,
-  setShowTemplateModal
+  setShowTemplateModal,
+  isReadOnly = false,
 }) {
   const getSlideIcon = (type) => {
     switch (type) {
@@ -70,7 +72,7 @@ export default function SlideListSidebar({
           onClick={() => setShowTemplateModal(true)}
           className="w-full py-2.5 px-3 rounded-xl bg-[#8854c0] hover:bg-[#733bb2] text-white text-xs font-extrabold flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer hover:shadow-md active:scale-98"
         >
-          <Plus className="w-4 h-4 stroke-[3]" />
+          {isReadOnly ? <Lock className="w-3.5 h-3.5" /> : <Plus className="w-4 h-4 stroke-[3]" />}
           <span>+ Thêm slide mới</span>
         </button>
       </div>
