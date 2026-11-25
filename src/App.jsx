@@ -17,7 +17,7 @@ import { SAMPLE_ACTIVITIES } from './data/mockData';
 import { Presentation, Sparkles, LayoutDashboard } from 'lucide-react';
 
 export default function App() {
-  // App Main Mode: 'presentation' (Ưu tiên theo yêu cầu) hoặc 'dashboard' (Xem tổng thể Wayground)
+  // App Main Mode: 'presentation' (Ưu tiên theo yêu cầu) hoặc 'dashboard' (Xem tổng thể ONTIN)
   const [currentAppMode, setCurrentAppMode] = useState('presentation');
 
   // Dashboard state
@@ -62,7 +62,7 @@ export default function App() {
         <div className="bg-gradient-to-r from-[#8854c0] to-[#aa3bff] px-6 py-3 text-white flex items-center justify-between text-xs font-semibold shadow-sm">
           <div className="flex items-center gap-2">
             <Presentation className="w-4 h-4" />
-            <span>Đang xem tổng quan Wayground. Bấm để mở Studio Thiết kế Bài giảng Thuyết trình:</span>
+            <span>Đang xem tổng quan ONTIN. Bấm để mở Studio Thiết kế Bài giảng Thuyết trình:</span>
           </div>
           <button
             onClick={() => setCurrentAppMode('presentation')}

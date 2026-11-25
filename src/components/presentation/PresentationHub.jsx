@@ -192,7 +192,7 @@ export default function PresentationHub({ onBackToDashboard }) {
       <div className="h-11 bg-[#1a1a24] border-b border-white/10 px-4 flex items-center justify-between text-xs text-white z-40">
         <div className="flex items-center gap-2">
           <span className="font-bold text-[#c084fc] flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5" /> Wayground Thuyết Trình
+            <Sparkles className="w-3.5 h-3.5" /> ONTIN Thuyết Trình
           </span>
           <span className="text-white/20">|</span>
           <span className="text-white/60 truncate max-w-xs">{lesson.title}</span>

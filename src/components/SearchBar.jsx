@@ -99,7 +99,7 @@ export default function SearchBar({ searchQuery, setSearchQuery, onSearchSubmit,
         >
           <div className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-bold text-[#737373] uppercase tracking-wider">
             <TrendingUp className="w-3.5 h-3.5 text-[#8854c0]" />
-            <span>Chủ đề thịnh hành trên Wayground</span>
+            <span>Chủ đề thịnh hành trên ONTIN</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-1 mt-1">

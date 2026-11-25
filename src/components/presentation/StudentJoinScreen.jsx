@@ -161,7 +161,7 @@ export default function StudentJoinScreen({
         <div className="flex-1 flex flex-col items-center justify-center p-6 max-w-md w-full mx-auto animate-in fade-in duration-200">
           <div className="text-center mb-6">
             <div className="w-14 h-14 rounded-3xl bg-gradient-to-tr from-[#8854c0] to-[#aa3bff] flex items-center justify-center font-black text-2xl mx-auto shadow-xl mb-3">
-              W
+              O
             </div>
             <h1 className="text-2xl font-black text-white">Tham Gia Bài Giảng</h1>
             <p className="text-xs text-[#a3a3a3] mt-1">
@@ -441,7 +441,7 @@ export default function StudentJoinScreen({
 
             {/* Bottom Status */}
             <div className="text-center text-[11px] text-[#737373] py-2">
-              Wayground Interactive Student Companion
+              ONTIN Interactive Student Companion
             </div>
           </main>
         </div>

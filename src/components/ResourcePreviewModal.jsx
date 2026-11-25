@@ -68,7 +68,7 @@ export default function ResourcePreviewModal({ activity, onClose }) {
               {activity.title}
             </h2>
             <p className="text-xs text-[#737373] mt-1">
-              Bởi <strong>{activity.author || 'Đội ngũ Sư phạm Wayground'}</strong> • {questions.length} câu hỏi • {activity.plays || '10k+'} lượt chơi
+              Bởi <strong>{activity.author || 'Đội ngũ Sư phạm ONTIN'}</strong> • {questions.length} câu hỏi • {activity.plays || '10k+'} lượt chơi
             </p>
           </div>
 

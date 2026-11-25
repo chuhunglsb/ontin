@@ -1,4 +1,4 @@
-# Wayground (Quizizz) - Chức Năng Thuyết Trình Tương Tác (Interactive Presentation & Live Lesson)
+# ONTIN - Chức Năng Thuyết Trình Tương Tác (Interactive Presentation & Live Lesson)
 
 Hệ thống cho phép giáo viên thiết kế các slide bài giảng thuyết trình kết hợp câu hỏi tương tác nhiều loại, đồng thời khởi chạy phòng học trực tiếp để học sinh nhập mã PIN 6 số tham gia trả lời thời gian thực.
 

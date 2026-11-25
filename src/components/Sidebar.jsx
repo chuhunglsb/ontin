@@ -30,13 +30,13 @@ export default function Sidebar({ activeNav, setActiveNav, onOpenAuth }) {
         <div className="p-4 flex items-center justify-between border-b border-[#f1f1f4]">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => setActiveNav('home')}>
             <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#8854c0] to-[#aa3bff] flex items-center justify-center text-white shadow-sm font-bold text-lg">
-              W
+              O
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-xl tracking-tight text-[#121212]">wayground</span>
+                <span className="font-extrabold text-xl tracking-tight text-[#121212]">ONTIN</span>
               </div>
-              <p className="text-[10px] text-[#737373] font-medium leading-none">trước đây là Quizizz</p>
+              <p className="text-[10px] text-[#737373] font-medium leading-none">Học tập & Thuyết trình</p>
             </div>
           </div>
           <span className="text-[10px] font-semibold bg-[#f3ecfb] text-[#8854c0] px-2 py-0.5 rounded-full">
@@ -77,7 +77,7 @@ export default function Sidebar({ activeNav, setActiveNav, onOpenAuth }) {
         <div className="mx-3 mt-4 p-3.5 rounded-2xl bg-gradient-to-br from-[#faf6fd] to-[#f3ecfb] border border-[#e8dcf7]">
           <div className="flex items-center gap-2 text-[#8854c0] font-bold text-xs mb-1">
             <Sparkles className="w-4 h-4" />
-            <span>Wayground AI</span>
+            <span>ONTIN AI</span>
           </div>
           <p className="text-xs text-[#525252] leading-relaxed">
             Tạo bài tập, quiz chuẩn hóa và phân hóa nội dung tự động chỉ với 1 cú click.

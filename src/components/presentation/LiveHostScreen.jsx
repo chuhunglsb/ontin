@@ -101,7 +101,7 @@ export default function LiveHostScreen({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-[#8854c0] to-[#aa3bff] flex items-center justify-center font-black text-xl">
-                W
+                O
               </div>
               <div>
                 <h1 className="text-xl font-extrabold tracking-tight">{lesson.title}</h1>

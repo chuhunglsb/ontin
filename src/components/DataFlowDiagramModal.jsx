@@ -89,7 +89,7 @@ export default function DataFlowDiagramModal({ onClose }) {
                 </span>
               </div>
               <p className="text-xs text-[#737373]">
-                Phân tích lưu lượng mạng, trạng thái client-side Pinia và endpoint API của Wayground
+                Phân tích lưu lượng mạng, trạng thái client-side Pinia và endpoint API của ONTIN
               </p>
             </div>
           </div>
@@ -147,7 +147,7 @@ export default function DataFlowDiagramModal({ onClose }) {
               <div className="p-4 rounded-2xl bg-white border border-[#e5e5e8] shadow-2xs">
                 <h3 className="font-bold text-sm text-[#121212] mb-2 flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-[#00a389]"></span>
-                  Kiến trúc Luồng dữ liệu Client - Server (Wayground SPA)
+                  Kiến trúc Luồng dữ liệu Client - Server (ONTIN SPA)
                 </h3>
                 <p className="text-xs text-[#525252] leading-relaxed">
                   Trang web sử dụng kiến trúc <strong>Single Page Application (SPA)</strong> chạy trên Vue 3 + Pinia Store. 

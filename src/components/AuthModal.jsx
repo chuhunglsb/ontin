@@ -11,10 +11,10 @@ export default function AuthModal({ onClose }) {
         <div className="p-5 border-b border-[#f1f1f4] flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-[#8854c0] text-white flex items-center justify-center font-bold">
-              W
+              O
             </div>
             <h3 className="font-bold text-base text-[#121212]">
-              Đăng nhập vào Wayground
+              Đăng nhập vào ONTIN
             </h3>
           </div>
           <button
@@ -67,7 +67,7 @@ export default function AuthModal({ onClose }) {
           </div>
 
           <div className="pt-2 text-center text-[11px] text-[#737373]">
-            Bằng việc tiếp tục, bạn đồng ý với Điều khoản dịch vụ và Chính sách quyền riêng tư của Wayground.
+            Bằng việc tiếp tục, bạn đồng ý với Điều khoản dịch vụ và Chính sách quyền riêng tư của ONTIN.
           </div>
         </div>
       </div>
